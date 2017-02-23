@@ -1,23 +1,19 @@
 
 /*
  * Copyright (C) 2010-2015 Alibaba Group Holding Limited
+ * Copyright (C) YoungJoo Kim (vozlt)
  */
 
 
-#include <ngx_config.h>
-#include <ngx_core.h>
-
-#if (NGX_HAVE_SYSINFO)
-#include <sys/sysinfo.h>
-#endif
+#include "ngx_http_sysguard_module.h"
 
 
 ngx_int_t
-ngx_getloadavg(ngx_int_t avg[], ngx_int_t nelem, ngx_log_t *log)
+ngx_http_sysguard_getloadavg(ngx_int_t avg[], ngx_int_t nelem, ngx_log_t *log)
 {
 #if (NGX_HAVE_GETLOADAVG)
-    double      loadavg[3];
-    ngx_int_t   i;
+    double     loadavg[3];
+    ngx_int_t  i;
 
     if (getloadavg(loadavg, nelem) == -1) {
         return NGX_ERROR;
@@ -31,8 +27,8 @@ ngx_getloadavg(ngx_int_t avg[], ngx_int_t nelem, ngx_log_t *log)
 
 #elif (NGX_HAVE_SYSINFO)
 
-    struct sysinfo s;
-    ngx_int_t   i;
+    struct     sysinfo s;
+    ngx_int_t  i;
 
     if (sysinfo(&s)) {
         return NGX_ERROR;
@@ -62,13 +58,13 @@ static ngx_file_t                   ngx_meminfo_file;
 
 
 ngx_int_t
-ngx_getmeminfo(ngx_meminfo_t *meminfo, ngx_log_t *log)
+ngx_http_sysguard_getmeminfo(ngx_http_sysguard_meminfo_t *meminfo, ngx_log_t *log)
 {
-    u_char              buf[2048];
-    u_char             *p, *start, *last;
-    size_t             *sz = NULL;
-    ssize_t             n, len;
-    ngx_fd_t            fd;
+    u_char     buf[2048];
+    u_char    *p, *start, *last;
+    size_t    *sz = NULL;
+    ssize_t    n, len;
+    ngx_fd_t   fd;
     enum {
         sw_name = 0,
         sw_value_start,
@@ -77,7 +73,7 @@ ngx_getmeminfo(ngx_meminfo_t *meminfo, ngx_log_t *log)
         sw_newline,
     } state;
 
-    ngx_memzero(meminfo, sizeof(ngx_meminfo_t));
+    ngx_memzero(meminfo, sizeof(ngx_http_sysguard_meminfo_t));
 
     if (ngx_meminfo_file.fd == 0) {
 
@@ -224,7 +220,7 @@ ngx_getmeminfo(ngx_meminfo_t *meminfo, ngx_log_t *log)
 #else
 
 ngx_int_t
-ngx_getmeminfo(ngx_meminfo_t *meminfo, ngx_log_t *log)
+ngx_http_sysguard_getmeminfo(ngx_http_sysguard_meminfo_t *meminfo, ngx_log_t *log)
 {
     ngx_log_error(NGX_LOG_EMERG, log, 0,
                   "getmeminfo is unsupported under current os");
@@ -233,3 +229,6 @@ ngx_getmeminfo(ngx_meminfo_t *meminfo, ngx_log_t *log)
 }
 
 #endif
+
+
+/* vi:set ft=c ts=4 sw=4 et fdm=marker: */

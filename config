@@ -1,0 +1,62 @@
+ngx_addon_name=ngx_http_sysguard_module
+
+HTTP_SYSGUARD_SRCS=" \
+                 $ngx_addon_dir/src/ngx_http_sysguard_module.c      \
+                 $ngx_addon_dir/src/ngx_http_sysguard_sysinfo.c     \
+                 $ngx_addon_dir/src/ngx_http_sysguard_node.c        \
+                 $ngx_addon_dir/src/ngx_http_sysguard_variables.c   \
+                 "
+
+HTTP_SYSGUARD_DEPS=" \
+                 $ngx_addon_dir/src/ngx_http_sysguard_module.h      \
+                 $ngx_addon_dir/src/ngx_http_sysguard_sysinfo.h     \
+                 $ngx_addon_dir/src/ngx_http_sysguard_node.h        \
+                 $ngx_addon_dir/src/ngx_http_sysguard_variables.h   \
+                 "
+if test -n "$ngx_module_link"; then
+    ngx_module_type=HTTP
+    ngx_module_name=$ngx_addon_name
+    ngx_module_srcs="$HTTP_SYSGUARD_SRCS"
+    ngx_module_deps="$HTTP_SYSGUARD_DEPS"
+
+    . auto/module
+else
+    HTTP_MODULES="$HTTP_MODULES $ngx_addon_name"
+    NGX_ADDON_SRCS="$NGX_ADDON_SRCS $HTTP_SYSGUARD_SRCS"
+    NGX_ADDON_DEPS="$NGX_ADDON_DEPS $HTTP_SYSGUARD_DEPS"
+fi
+
+
+ngx_feature="sysinfo()"
+ngx_feature_name="NGX_HAVE_SYSINFO"
+ngx_feature_run=no
+ngx_feature_incs="#include <sys/sysinfo.h>"
+ngx_feature_path=
+ngx_feature_libs=
+ngx_feature_test="struct sysinfo s;
+                  sysinfo(&s);"
+. auto/feature
+
+
+ngx_feature="getloadavg()"
+ngx_feature_name="NGX_HAVE_GETLOADAVG"
+ngx_feature_run=no
+ngx_feature_incs="#include <stdlib.h>"
+ngx_feature_path=
+ngx_feature_libs=
+ngx_feature_test="double loadavg[1];
+                  getloadavg(loadavg, 1);"
+. auto/feature
+
+
+ngx_feature="/proc/meminfo"
+ngx_feature_name="NGX_HAVE_PROC_MEMINFO"
+ngx_feature_run=yes
+ngx_feature_incs="#include <fcntl.h>"
+ngx_feature_path=
+ngx_feature_libs=
+ngx_feature_test='int fd;
+                  if (open("/proc/meminfo", O_RDONLY) == -1) return 1;'
+. auto/feature
+
+# vi:set ft=sh ts=4 sw=4 et fdm=marker:

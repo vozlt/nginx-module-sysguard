@@ -1,0 +1,11 @@
+v0.1.0 [Thu Feb 23 2017 YoungJoo.Kim <vozltx@gmail.com>]
+    * The first version.
+
+    * Feature: changed the algorithm for calculating response time
+      in sysguard_rt directive to avoid being stuck in 503 after redirect.
+
+    * Feature: added "method=" option in sysguard_rt directive.
+
+    * Feature: added embedded Variables.
+
+# vi:set ft=changelog ts=4 sw=4 et fdm=marker:
