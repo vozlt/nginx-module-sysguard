@@ -13,6 +13,9 @@
 #include <sys/sysinfo.h>
 #endif
 
+#if (NGX_HAVE_VM_STATS)
+#include <sys/sysctl.h>
+#endif
 
 /* in bytes */
 typedef struct {

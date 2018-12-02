@@ -217,6 +217,50 @@ ngx_http_sysguard_getmeminfo(ngx_http_sysguard_meminfo_t *meminfo, ngx_log_t *lo
     return NGX_OK;
 }
 
+#elif (NGX_HAVE_VM_STATS)
+
+static ngx_int_t
+ngx_http_sysguard_vm_stats(const char *name, size_t *res, ngx_log_t *log)
+{
+    size_t val;
+    size_t reslen = sizeof(size_t);
+    *res = 0;
+
+    if (sysctlbyname(name, &val, &reslen, NULL, 0) == -1) {
+        ngx_log_error(NGX_LOG_EMERG, log, ngx_errno,
+                "sysctl \"%s\" failed", name);
+        return NGX_ERROR;
+    }
+
+    *res = val;
+
+    return NGX_OK;
+}
+
+ngx_int_t
+ngx_http_sysguard_getmeminfo(ngx_http_sysguard_meminfo_t *meminfo, ngx_log_t *log)
+{
+    ngx_memzero(meminfo, sizeof(ngx_http_sysguard_meminfo_t));
+
+    if (ngx_http_sysguard_vm_stats("vfs.bufspace",
+        &meminfo->bufferram, log) != NGX_OK) {
+        return NGX_ERROR;
+    }
+    if (ngx_http_sysguard_vm_stats("vm.stats.vm.v_cache_count",
+        &meminfo->cachedram, log) != NGX_OK) {
+        return NGX_ERROR;
+    }
+    if (ngx_http_sysguard_vm_stats("vm.stats.vm.v_free_count",
+        &meminfo->freeram, log) != NGX_OK) {
+        return NGX_ERROR;
+    }
+    if (ngx_http_sysguard_vm_stats("hw.usermem",
+        &meminfo->totalram, log) != NGX_OK) {
+        return NGX_ERROR;
+    }
+
+    return NGX_OK;
+}
 #else
 
 ngx_int_t
