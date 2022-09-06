@@ -204,7 +204,7 @@ The following embedded variables are provided:
 
 `Description:` Specify the response time threshold.
 Parameter rt is used to set a threshold of the average response time, in second.
-Parameter period is used to specifiy the period of the statistics cycle.
+Parameter period is used to specify the period of the statistics cycle.
 If the average response time of the system exceeds the threshold specified by the user,
 the incoming request will be redirected to a specified url which is defined by parameter 'action'.
 If no 'action' is presented, the request will be responsed with 503 error directly.
